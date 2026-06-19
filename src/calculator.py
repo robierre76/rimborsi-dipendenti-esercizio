@@ -13,6 +13,12 @@ def massimale_teorico(richiesta, giornate_agile_gia_rimborsate=0):
             max(rules.MASSIMO_GIORNATE_LAVORO_AGILE - giornate_agile_gia_rimborsate, 0),
         )
         return round(p["massimali_giornalieri"]["lavoro_agile"] * giornate_ammesse, 2)
+    if categoria == "trasferta_estero" and richiesta["data"][:4] >= "2026":
+        g = richiesta["giorni"]
+        g1 = min(g, 5)
+        g2 = min(max(g - 5, 0), 5)
+        g3 = max(g - 10, 0)
+        return round(g1 * 85.00 + g2 * 76.50 + g3 * 68.00, 2)
     if categoria in rules.CATEGORIE_A_GIORNATE:
         return round(p["massimali_giornalieri"][categoria] * richiesta["giorni"], 2)
     if categoria == "chilometrico":

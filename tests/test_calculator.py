@@ -107,6 +107,26 @@ class TestMassimaleTeorico2026:
         r = richiesta_2026(categoria="alloggio", notti=2)
         assert calculator.massimale_teorico(r) == 340.00
 
+    def test_trasferta_estero_5gg_esatte_no_riduzione(self):
+        # 5 giornate: riduzione non si applica → 5 × 85.00
+        r = richiesta_2026(categoria="trasferta_estero", giorni=5)
+        assert calculator.massimale_teorico(r) == 425.00
+
+    def test_trasferta_estero_6gg_riduzione_parziale(self):
+        # (5×85) + (1×76.50) = 501.50
+        r = richiesta_2026(categoria="trasferta_estero", giorni=6)
+        assert calculator.massimale_teorico(r) == 501.50
+
+    def test_trasferta_estero_12gg_riduzione_progressiva(self):
+        # (5×85) + (5×76.50) + (2×68) = 425 + 382.50 + 136 = 943.50
+        r = richiesta_2026(categoria="trasferta_estero", giorni=12)
+        assert calculator.massimale_teorico(r) == 943.50
+
+    def test_trasferta_estero_2025_no_riduzione(self):
+        # data 2025: massimale costante 77.47 × 8 = 619.76
+        r = richiesta_2026(data="2025-06-01", categoria="trasferta_estero", giorni=8)
+        assert calculator.massimale_teorico(r) == 619.76
+
 
 class TestCalcola2026:
     def test_plafond_2026_esaurito(self):
