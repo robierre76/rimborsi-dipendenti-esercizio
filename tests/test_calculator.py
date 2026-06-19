@@ -70,3 +70,59 @@ class TestCalcola:
             "esente_teorica": 154.94,
             "capienza_plafond": 100.0,
         }
+
+
+def richiesta_2026(**campi):
+    base = {
+        "dipendente": "Maria Rossi",
+        "data": "2026-03-10",
+        "categoria": "pasto",
+        "importo": 10.0,
+        "giorni": 1,
+        "km": None,
+        "notti": None,
+    }
+    base.update(campi)
+    return base
+
+
+class TestMassimaleTeorico2026:
+    def test_trasferta_italia_2026(self):
+        r = richiesta_2026(categoria="trasferta_italia", giorni=4)
+        assert calculator.massimale_teorico(r) == 200.00
+
+    def test_trasferta_estero_2026(self):
+        r = richiesta_2026(categoria="trasferta_estero", giorni=3)
+        assert calculator.massimale_teorico(r) == 255.00
+
+    def test_pasto_2026(self):
+        r = richiesta_2026(categoria="pasto", giorni=5)
+        assert calculator.massimale_teorico(r) == 50.00
+
+    def test_chilometrico_2026(self):
+        r = richiesta_2026(categoria="chilometrico", km=250)
+        assert calculator.massimale_teorico(r) == 112.50
+
+    def test_alloggio_2026(self):
+        r = richiesta_2026(categoria="alloggio", notti=2)
+        assert calculator.massimale_teorico(r) == 340.00
+
+
+class TestCalcola2026:
+    def test_plafond_2026_esaurito(self):
+        r = richiesta_2026(categoria="pasto", giorni=1, importo=10.0)
+        esente, imponibile, _ = calculator.calcola(r, esente_gia_riconosciuta=1400.0)
+        assert esente == 0.0
+        assert imponibile == 10.0
+
+    def test_plafond_2026_incapiente(self):
+        r = richiesta_2026(categoria="pasto", giorni=5, importo=50.0)
+        esente, imponibile, _ = calculator.calcola(r, esente_gia_riconosciuta=1350.0)
+        assert esente == 50.0
+        assert imponibile == 0.0
+
+    def test_transitorio_data_2025_usa_vecchi_massimali(self):
+        r = richiesta_2026(data="2025-12-31", categoria="pasto", giorni=1, importo=8.0)
+        esente, imponibile, _ = calculator.calcola(r, esente_gia_riconosciuta=1200.0)
+        assert esente == 0.0
+        assert imponibile == 8.0
