@@ -121,6 +121,20 @@ class TestCalcola2026:
         assert esente == 50.0
         assert imponibile == 0.0
 
+    def test_lavoro_agile_entro_limite(self):
+        r = richiesta_2026(categoria="lavoro_agile", giorni=6, importo=21.00)
+        # 8 giornate già rimborsate → ammesse min(6, 12-8) = 4 → massimale 14.00
+        esente, imponibile, _ = calculator.calcola(r, esente_gia_riconosciuta=0.0, giornate_agile_gia_rimborsate=8)
+        assert esente == 14.00
+        assert imponibile == 7.00
+
+    def test_lavoro_agile_oltre_limite_mensile(self):
+        r = richiesta_2026(categoria="lavoro_agile", giorni=15, importo=52.50)
+        # nessuna giornata precedente → ammesse min(15, 12) = 12 → massimale 42.00
+        esente, imponibile, _ = calculator.calcola(r, esente_gia_riconosciuta=0.0, giornate_agile_gia_rimborsate=0)
+        assert esente == 42.00
+        assert imponibile == 10.50
+
     def test_transitorio_data_2025_usa_vecchi_massimali(self):
         r = richiesta_2026(data="2025-12-31", categoria="pasto", giorni=1, importo=8.0)
         esente, imponibile, _ = calculator.calcola(r, esente_gia_riconosciuta=1200.0)

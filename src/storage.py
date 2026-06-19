@@ -28,6 +28,19 @@ def mese(richiesta):
     return richiesta["data"][:7]
 
 
+def giornate_agile_riconosciute_nel_mese(richieste, dipendente, mese_riferimento):
+    """Somma dei giorni di lavoro agile delle richieste valide del dipendente nel mese."""
+    totale = sum(
+        r["giorni"]
+        for r in richieste
+        if r["dipendente"] == dipendente
+        and r["stato"] == "valida"
+        and r["categoria"] == "lavoro_agile"
+        and mese(r) == mese_riferimento
+    )
+    return totale
+
+
 def esente_riconosciuta_nel_mese(richieste, dipendente, mese_riferimento):
     """Somma delle quote esenti delle richieste valide del dipendente nel mese."""
     totale = sum(

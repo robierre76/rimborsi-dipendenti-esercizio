@@ -19,7 +19,10 @@ MASSIMALI_GIORNALIERI_2026 = {
     "trasferta_italia": 50.00,
     "trasferta_estero": 85.00,
     "pasto": 10.00,
+    "lavoro_agile": 3.50,
 }
+
+MASSIMO_GIORNATE_LAVORO_AGILE = 12
 MASSIMALE_KM_2026    = 0.45
 MASSIMALE_NOTTE_2026 = 170.00
 PLAFOND_MENSILE_2026 = 1400.00
@@ -55,8 +58,9 @@ CATEGORIE = {
     "pasto": "Rimborso pasto",
     "chilometrico": "Rimborso chilometrico",
     "alloggio": "Rimborso alloggio",
+    "lavoro_agile": "Indennità lavoro agile",
 }
 
-CATEGORIE_A_GIORNATE = ("trasferta_italia", "trasferta_estero", "pasto")
+CATEGORIE_A_GIORNATE = ("trasferta_italia", "trasferta_estero", "pasto", "lavoro_agile")
 
 RIFERIMENTO_NORMATIVO = "Circolare MEF n. 18/2026"

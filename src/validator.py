@@ -14,6 +14,10 @@ def valida(richiesta):
     if categoria not in rules.CATEGORIE:
         return False, "categoria non riconosciuta"
 
+    data = richiesta.get("data") or ""
+    if categoria == "lavoro_agile" and data[:4] < "2026":
+        return False, "categoria non riconosciuta"
+
     importo = richiesta.get("importo")
     if importo is None or importo <= 0:
         return False, "importo non positivo"

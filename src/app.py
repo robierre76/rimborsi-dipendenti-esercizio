@@ -40,7 +40,12 @@ def _registra(form):
         gia_riconosciuta = storage.esente_riconosciuta_nel_mese(
             richieste, richiesta["dipendente"], storage.mese(richiesta)
         )
-        esente, imponibile, dettaglio = calculator.calcola(richiesta, gia_riconosciuta)
+        giornate_agile = storage.giornate_agile_riconosciute_nel_mese(
+            richieste, richiesta["dipendente"], storage.mese(richiesta)
+        )
+        esente, imponibile, dettaglio = calculator.calcola(
+            richiesta, gia_riconosciuta, giornate_agile
+        )
         richiesta.update(
             stato="valida",
             motivazione="",

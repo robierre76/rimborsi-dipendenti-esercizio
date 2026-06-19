@@ -3,10 +3,16 @@
 from src import rules
 
 
-def massimale_teorico(richiesta):
+def massimale_teorico(richiesta, giornate_agile_gia_rimborsate=0):
     """Massimale di esenzione applicabile alla richiesta, in base alla categoria e alla data."""
     p = rules.parametri_per_data(richiesta["data"])
     categoria = richiesta["categoria"]
+    if categoria == "lavoro_agile":
+        giornate_ammesse = min(
+            richiesta["giorni"],
+            max(rules.MASSIMO_GIORNATE_LAVORO_AGILE - giornate_agile_gia_rimborsate, 0),
+        )
+        return round(p["massimali_giornalieri"]["lavoro_agile"] * giornate_ammesse, 2)
     if categoria in rules.CATEGORIE_A_GIORNATE:
         return round(p["massimali_giornalieri"][categoria] * richiesta["giorni"], 2)
     if categoria == "chilometrico":
@@ -16,15 +22,17 @@ def massimale_teorico(richiesta):
     raise ValueError(f"categoria non gestita: {categoria}")
 
 
-def calcola(richiesta, esente_gia_riconosciuta):
+def calcola(richiesta, esente_gia_riconosciuta, giornate_agile_gia_rimborsate=0):
     """Restituisce (quota_esente, quota_imponibile, dettaglio).
 
     `esente_gia_riconosciuta` è la quota esente già riconosciuta al dipendente
     nel mese della richiesta, ai fini del plafond mensile.
+    `giornate_agile_gia_rimborsate` è il numero di giornate di lavoro agile già
+    rimborsate al dipendente nel mese, ai fini del limite di 12 giornate.
     """
     p = rules.parametri_per_data(richiesta["data"])
     importo = richiesta["importo"]
-    teorico = massimale_teorico(richiesta)
+    teorico = massimale_teorico(richiesta, giornate_agile_gia_rimborsate)
     esente_teorica = min(importo, teorico)
     capienza = max(p["plafond_mensile"] - esente_gia_riconosciuta, 0.0)
     esente = round(min(esente_teorica, capienza), 2)
