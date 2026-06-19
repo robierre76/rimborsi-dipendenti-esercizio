@@ -1,3 +1,7 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # rimborsi-dipendenti-esercizio
 
 Web app Flask per la gestione dei rimborsi spese dei dipendenti, con calcolo automatico della quota esente IRPEF e del plafond mensile.
