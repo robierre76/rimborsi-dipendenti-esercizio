@@ -7,6 +7,7 @@ from src import calculator, rules, storage, validator
 app = Flask(__name__)
 
 
+
 def _numero(valore):
     try:
         return float(valore)
