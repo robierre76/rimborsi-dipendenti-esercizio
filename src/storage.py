@@ -1,6 +1,7 @@
 """Persistenza delle richieste su file JSON."""
 
 import json
+from datetime import date, timedelta
 from pathlib import Path
 
 PERCORSO_DATI = Path(__file__).resolve().parent.parent / "data" / "richieste.json"
@@ -26,6 +27,13 @@ def prossimo_id(richieste):
 def mese(richiesta):
     """Mese di riferimento di una richiesta, nel formato AAAA-MM."""
     return richiesta["data"][:7]
+
+
+def giornate_coperte(richiesta) -> set:
+    """Insieme delle date (ISO string) coperte dalla richiesta (per categorie a giornate)."""
+    inizio = date.fromisoformat(richiesta["data"])
+    giorni = richiesta.get("giorni") or 1
+    return {str(inizio + timedelta(days=i)) for i in range(giorni)}
 
 
 def giornate_agile_riconosciute_nel_mese(richieste, dipendente, mese_riferimento):

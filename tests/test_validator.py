@@ -115,3 +115,60 @@ def test_lavoro_agile_ante_2026_respinto():
     )
     assert not ok
     assert motivazione == "categoria non riconosciuta"
+
+
+def _richiesta_valida_esistente(**campi):
+    """Richiesta già registrata come valida, usata nei test di incompatibilità."""
+    base = {
+        "dipendente": "Maria Rossi",
+        "data": "2026-03-02",
+        "categoria": "trasferta_italia",
+        "importo": 100.0,
+        "giorni": 5,
+        "km": None,
+        "notti": None,
+        "stato": "valida",
+        "quota_esente": 100.0,
+    }
+    base.update(campi)
+    return base
+
+
+def test_lavoro_agile_incompatibile_con_trasferta():
+    # trasferta nazionale 02/03 → 06/03, lavoro agile 06/03 → 08/03: giornata 06 si sovrappone
+    trasferta = _richiesta_valida_esistente(
+        categoria="trasferta_italia", data="2026-03-02", giorni=5
+    )
+    nuova = richiesta(categoria="lavoro_agile", data="2026-03-06", giorni=3)
+    ok, motivazione = validator.valida(nuova, [trasferta])
+    assert not ok
+    assert motivazione == "incompatibilità lavoro agile / trasferta"
+
+
+def test_trasferta_incompatibile_con_lavoro_agile():
+    # lavoro agile 10/03 → 12/03, trasferta estera 12/03: giornata 12 si sovrappone
+    agile = _richiesta_valida_esistente(
+        categoria="lavoro_agile", data="2026-03-10", giorni=3
+    )
+    nuova = richiesta(categoria="trasferta_estero", data="2026-03-12", giorni=2)
+    ok, motivazione = validator.valida(nuova, [agile])
+    assert not ok
+    assert motivazione == "incompatibilità lavoro agile / trasferta"
+
+
+def test_incompatibilita_non_si_applica_al_2025():
+    # stessa sovrapposizione ma data 2025: nessun controllo incompatibilità
+    trasferta = _richiesta_valida_esistente(
+        categoria="trasferta_italia", data="2025-03-02", giorni=5
+    )
+    nuova = richiesta(categoria="pasto", data="2025-03-04", giorni=1)
+    assert validator.valida(nuova, [trasferta]) == (True, "")
+
+
+def test_richiesta_respinta_non_produce_incompatibilita():
+    # una richiesta respinta non blocca la nuova
+    trasferta_respinta = _richiesta_valida_esistente(
+        categoria="trasferta_italia", data="2026-03-02", giorni=5, stato="respinta"
+    )
+    nuova = richiesta(categoria="lavoro_agile", data="2026-03-04", giorni=1)
+    assert validator.valida(nuova, [trasferta_respinta]) == (True, "")

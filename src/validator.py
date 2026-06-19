@@ -2,10 +2,12 @@
 
 from datetime import date
 
-from src import rules
+from src import rules, storage
+
+CATEGORIE_TRASFERTA = {"trasferta_italia", "trasferta_estero"}
 
 
-def valida(richiesta):
+def valida(richiesta, richieste_esistenti=None):
     """Restituisce (True, "") se la richiesta è valida, altrimenti (False, motivazione)."""
     if not richiesta.get("dipendente"):
         return False, "dipendente mancante"
@@ -42,4 +44,33 @@ def valida(richiesta):
         if not notti or notti <= 0:
             return False, "numero di notti non valido"
 
+    # Incompatibilità lavoro agile / trasferta (solo per date >= 2026)
+    if data[:4] >= "2026" and richieste_esistenti is not None:
+        if categoria == "lavoro_agile" or categoria in CATEGORIE_TRASFERTA:
+            if _incompatibile(richiesta, richieste_esistenti):
+                return False, "incompatibilità lavoro agile / trasferta"
+
     return True, ""
+
+
+def _incompatibile(richiesta, richieste_esistenti):
+    """True se la richiesta si sovrappone a una richiesta valida di categoria incompatibile."""
+    categoria = richiesta["categoria"]
+    dipendente = richiesta["dipendente"]
+    giornate_nuova = storage.giornate_coperte(richiesta)
+
+    if categoria == "lavoro_agile":
+        categorie_opposte = CATEGORIE_TRASFERTA
+    else:
+        categorie_opposte = {"lavoro_agile"}
+
+    for r in richieste_esistenti:
+        if r["stato"] != "valida":
+            continue
+        if r["dipendente"] != dipendente:
+            continue
+        if r["categoria"] not in categorie_opposte:
+            continue
+        if giornate_nuova & storage.giornate_coperte(r):
+            return True
+    return False
