@@ -1,5 +1,9 @@
 # Piano: aggiornamento massimali e plafond mensile (Sezione 2, dal 01/01/2026)
 
+## Riferimento normativo
+
+Documento completo: [Doc/ITA_circolare_mef_18_2026.pdf](Doc/ITA_circolare_mef_18_2026.pdf)
+
 ## Contesto
 
 La Circolare MEF n. 18/2026 ridetermina, con decorrenza 01/01/2026, i massimali giornalieri di esenzione
